@@ -19,7 +19,7 @@ protected:
 private slots:
     void startServer();
 private:
-    QMap <qintptr, connection *> peers;
+    QMap <qintptr, Connection *> peers;
     bool active = false;
 };
 
