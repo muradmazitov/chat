@@ -1,31 +1,41 @@
 #include "connection.h"
 
-Connection::Connection(qintptr ID, QObject *parent) :
-    QThread(parent)
+Connection::Connection(qintptr ID, QObject *parent) : QThread(parent)
 {
-    id = ID;
-
+    this -> id = ID;
 }
 
 void Connection::run()
 {
-    socket = new QTcpSocket();
-    if (!socket -> setSocketDescriptor(id)) {
-        qDebug() << "WTF";
-    } else {
-        qDebug() << id << " connected";
+    qDebug() << id << " STRATING THREAD";
+    socket = new QTcpSocket;
+    if (!socket -> setSocketDescriptor(id))
+    {
+        emit this->error(socket -> error());
+        return;
     }
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyDATA()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
+    socket -> write("HELLO CLIENT");
+    socket -> flush();
+    connect(socket, SIGNAL(connected()), this, SLOT(connected()), Qt::DirectConnection);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
+    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
+    qDebug() << id << "Client connected";
+    exec();
 }
-
-void Connection::readyDATA()
+void Connection::connected()
+{
+    qDebug() << "CONNECTED UDER";
+    socket -> write("HELLO");
+    socket -> flush();
+}
+void Connection::readyRead()
 {
     QByteArray data = socket->readAll();
     socket->write(data);
+    socket->flush();
 }
 
-void Connection::disconnect()
+void Connection::disconnected()
 {
     socket->deleteLater();
     exit(0);

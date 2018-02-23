@@ -1,14 +1,21 @@
 #include "server.h"
 
-Server::Server(ChatDialog *w)
+Server::Server(QObject *parent) : QTcpServer(parent)
 {
-    connect(w -> pushButton, SIGNAL(clicked(bool)), this, SLOT(startServer()));
+
+}
+
+Server::Server(ChatDialog *w, QObject *parent) : QTcpServer(parent)
+{
+    connect(w -> pushButton, SIGNAL(pressed()), this, SLOT(startServer()));
 }
 
 void Server::startServer()
 {
-    server = new QTcpServer();
-    if (!server -> listen(QHostAddress::Any, 1234))
+    if (active) return;
+
+    active = true;
+    if (!this -> listen(QHostAddress::Any, 1234))
     {
         qDebug() << "Server couldnt start";
     }
@@ -16,15 +23,13 @@ void Server::startServer()
     {
         qDebug() << "Server just started";
     }
-    connect(server, SIGNAL(newConnection()), this, SLOT(incomingConnection()));
 }
 
-void Server::incomingConnection()
+void Server::incomingConnection(qintptr socketDescriptor)
 {
-    qintptr ID = server -> nextPendingConnection() -> socketDescriptor();
-    qDebug() << "INCOMING CONNECTION" << ID;
-    Connection *connection = new Connection(ID);
-    connect(connection , SIGNAL(finished()), connection, SLOT(deleteLater()));
-    //connection -> socket -> write("HELLO CLIENT");
-    //connection -> socket -> flush();
+    qDebug() << "INCOMING CONNECTION" << socketDescriptor;
+    Connection *connection = new Connection(socketDescriptor, this);
+    peers[socketDescriptor] = connection;
+    connect(connection, SIGNAL(finished()), connection, SLOT(deleteLater()));
+    connection->start();
 }
