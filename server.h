@@ -11,18 +11,23 @@
 class Server : public QTcpServer
 {
     Q_OBJECT
+
 public:
     Server(ChatDialog *w = 0, QObject *parent = 0);
     explicit Server(QObject *parent = 0);
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
+
 public slots:
     void disconnect_id(qintptr id);
     void get_message();
+
 private slots:
     void startServer();
     void add_connection();
     void remove_connection();
+
 private:
     int count_connected = 0;
     QMap <qintptr, Connection *> peers;

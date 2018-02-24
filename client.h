@@ -11,10 +11,9 @@
 class Client : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Client(ChatDialog *w);
-
-signals:
 
 public slots:
     void change_username(QString name);
@@ -22,6 +21,7 @@ public slots:
     void send_message();
     void connected();
     void getmessage();
+
 private:
     QLineEdit *lineEdit, *serveradress;
     QString username;

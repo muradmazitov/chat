@@ -2,10 +2,10 @@
 #define CHATDIALOG_H
 
 #include "ui_chatdialog.h"
-#include <QString>
-#include <QWidget>
 #include <QTextTable>
 #include <QScrollBar>
+#include <QString>
+#include <QWidget>
 
 class ChatDialog : public QDialog, public Ui::ChatDialog
 {
@@ -16,12 +16,9 @@ public:
 
 public slots:
     void appendMessage(QString message);
+
 signals:
     tryStartServer();
-/*private slots:
-    void returnPressed();
-    void newParticipant(const QString &nick);
-    void participantLeft(const QString &nick);*/
 
 private:
     QTextTableFormat tableFormat;

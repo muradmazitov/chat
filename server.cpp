@@ -1,9 +1,7 @@
 #include "server.h"
 
 Server::Server(QObject *parent) : QTcpServer(parent)
-{
-
-}
+{}
 
 Server::Server(ChatDialog *w, QObject *parent) : QTcpServer(parent)
 {
@@ -14,7 +12,6 @@ void Server::startServer()
 {
     if (active) return;
     active = true;
-    //if (!this -> listen(QHostAddress("127.0.0.1"), 1234))
     if (!this -> listen(QHostAddress::Any, 1234))
     {
         qDebug() << "Server couldnt start";
