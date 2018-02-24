@@ -18,7 +18,10 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 private slots:
     void startServer();
+    void add_connection();
+    void remove_connection();
 private:
+    int count_connected = 0;
     QMap <qintptr, Connection *> peers;
     bool active = false;
 };

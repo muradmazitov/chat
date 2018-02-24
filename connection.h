@@ -14,7 +14,8 @@ public:
 
 signals:
     void error(QTcpSocket::SocketError sockEr);
-
+    void add_connection();
+    void remove_connection();
 public slots:
     void readyRead();
     void connected();

@@ -11,12 +11,14 @@ SOURCES += \
         main.cpp \
         chatdialog.cpp \
     server.cpp \
-    connection.cpp
+    connection.cpp \
+    client.cpp
 
 HEADERS += \
         chatdialog.h \
     server.h \
-    connection.h
+    connection.h \
+    client.h
 
 FORMS += \
         chatdialog.ui

@@ -21,11 +21,7 @@ signals:
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);*/
 
-private slots:
-    void on_pushButton_clicked();
-
 private:
-    QString myNickName;
     QTextTableFormat tableFormat;
 };
 

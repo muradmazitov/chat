@@ -14,30 +14,32 @@ void Connection::run()
         emit this->error(socket -> error());
         return;
     }
-    socket -> write("HELLO CLIENT");
-    socket -> flush();
+    emit add_connection();
+    socket -> write("0 HI");
     connect(socket, SIGNAL(connected()), this, SLOT(connected()), Qt::DirectConnection);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
     qDebug() << id << "Client connected";
     exec();
 }
+
 void Connection::connected()
 {
-    qDebug() << "CONNECTED UDER";
-    socket -> write("HELLO");
-    socket -> flush();
+    qDebug() << "CONNECTED USER";
 }
+
 void Connection::readyRead()
 {
     QByteArray data = socket->readAll();
+    qDebug() << id << " data : " << data;
     socket->write(data);
     socket->flush();
 }
 
 void Connection::disconnected()
 {
+    qDebug() << id << " disconnected";
+    emit remove_connection();
     socket->deleteLater();
     exit(0);
 }
-

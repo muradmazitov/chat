@@ -16,8 +16,3 @@ ChatDialog::ChatDialog(QWidget *parent) : QDialog(parent)
     tableFormat.setBorder(0);
 }
 
-
-void ChatDialog::on_pushButton_clicked()
-{
-    emit tryStartServer();
-}
