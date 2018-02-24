@@ -4,6 +4,8 @@
 #include "ui_chatdialog.h"
 #include <QString>
 #include <QWidget>
+#include <QTextTable>
+#include <QScrollBar>
 
 class ChatDialog : public QDialog, public Ui::ChatDialog
 {
@@ -13,7 +15,7 @@ public:
     ChatDialog(QWidget *parent = 0);
 
 public slots:
-    //void appendMessage(const QString &from, const QString &message);
+    void appendMessage(QString message);
 signals:
     tryStartServer();
 /*private slots:

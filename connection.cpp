@@ -8,7 +8,7 @@ Connection::Connection(qintptr ID, QObject *parent) : QThread(parent)
 void Connection::run()
 {
     qDebug() << id << " STRATING THREAD";
-    socket = new QTcpSocket;
+    socket = new QTcpSocket();
     if (!socket -> setSocketDescriptor(id))
     {
         emit this->error(socket -> error());
@@ -16,10 +16,13 @@ void Connection::run()
     }
     emit add_connection();
     socket -> write("0 HI");
+    socket->flush();
+    socket -> waitForBytesWritten(3000);
     connect(socket, SIGNAL(connected()), this, SLOT(connected()), Qt::DirectConnection);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
     qDebug() << id << "Client connected";
+
     exec();
 }
 
@@ -32,8 +35,8 @@ void Connection::readyRead()
 {
     QByteArray data = socket->readAll();
     qDebug() << id << " data : " << data;
-    socket->write(data);
-    socket->flush();
+    message = data;
+    emit newmessage();
 }
 
 void Connection::disconnected()

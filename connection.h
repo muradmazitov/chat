@@ -11,17 +11,18 @@ class Connection : public QThread
 public:
     explicit Connection(qintptr ID, QObject *parent = 0);
     void run();
-
+    QByteArray message;
 signals:
     void error(QTcpSocket::SocketError sockEr);
+    void newmessage();
     void add_connection();
     void remove_connection();
+    void disconnect_id(qintptr id);
 public slots:
     void readyRead();
     void connected();
     void disconnected();
-
-private:
+public:
     QTcpSocket *socket;
     qintptr id;
 };

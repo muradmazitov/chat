@@ -20,10 +20,13 @@ public slots:
     void change_username(QString name);
     void connect_to_server();
     void send_message();
+    void connected();
+    void getmessage();
 private:
     QLineEdit *lineEdit, *serveradress;
     QString username;
     QTcpSocket *socket;
+    ChatDialog *dialog;
 };
 
 #endif // CLIENT_H

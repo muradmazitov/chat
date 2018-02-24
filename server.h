@@ -16,6 +16,9 @@ public:
     explicit Server(QObject *parent = 0);
 protected:
     void incomingConnection(qintptr socketDescriptor);
+public slots:
+    void disconnect_id(qintptr id);
+    void get_message();
 private slots:
     void startServer();
     void add_connection();

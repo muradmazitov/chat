@@ -16,3 +16,12 @@ ChatDialog::ChatDialog(QWidget *parent) : QDialog(parent)
     tableFormat.setBorder(0);
 }
 
+void ChatDialog::appendMessage(QString message)
+{
+     QTextCursor cursor(textEdit->textCursor());
+       cursor.movePosition(QTextCursor::End);
+       QTextTable *table = cursor.insertTable(1, 2, tableFormat);
+       table->cellAt(0, 0).firstCursorPosition().insertText(message);
+      QScrollBar *bar = textEdit->verticalScrollBar();
+      bar->setValue(bar->maximum());
+}
