@@ -4,26 +4,27 @@
 #include <QTcpSocket>
 #include <QThread>
 #include <QDebug>
+#include <QScopedPointer>
 
 class Connection : public QThread
 {
     Q_OBJECT
-public:
-    explicit Connection(qintptr ID, QObject *parent = 0);
-    void run();
-    QByteArray message;
+    
 signals:
     void error(QTcpSocket::SocketError sockEr);
     void newmessage();
     void add_connection();
     void remove_connection();
-    void disconnect_id(qintptr id);
+
 public slots:
     void readyRead();
-    void connected();
     void disconnected();
+
 public:
-    QTcpSocket *socket;
+    explicit Connection(qintptr ID);
+    void run();
+    QByteArray message;
+    QScopedPointer <QTcpSocket> socket;
     qintptr id;
 };
 

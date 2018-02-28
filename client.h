@@ -7,7 +7,6 @@
 #include <QObject>
 #include <QWidget>
 #include <chatdialog.h>
-
 class Client : public QObject
 {
     Q_OBJECT
@@ -20,10 +19,10 @@ public slots:
     void connect_to_server();
     void send_message();
     void connected();
+    void stop();
     void getmessage();
 
 private:
-    QLineEdit *lineEdit, *serveradress;
     QString username;
     QTcpSocket *socket;
     ChatDialog *dialog;
