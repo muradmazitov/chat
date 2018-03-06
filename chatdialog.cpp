@@ -9,14 +9,14 @@ ChatDialog::ChatDialog(QWidget *parent) : QDialog(parent)
     textEdit->setReadOnly(true);
     listWidget->setFocusPolicy(Qt::NoFocus);
 
-    tableFormat.setBorder(0);
+    TableFormat.setBorder(0);
 }
 
-void ChatDialog::appendMessage(QString message)
+void ChatDialog::AppendMessage(QString message)
 {
     QTextCursor cursor(textEdit->textCursor());
     cursor.movePosition(QTextCursor::End);
-    QTextTable *table = cursor.insertTable(1, 2, tableFormat);
+    QTextTable *table = cursor.insertTable(1, 2, TableFormat);
     table->cellAt(0, 0).firstCursorPosition().insertText(message);
     QScrollBar *bar = textEdit->verticalScrollBar();
     bar->setValue(bar->maximum());

@@ -7,6 +7,7 @@
 #include <QMap>
 #include <connection.h>
 #include <chatdialog.h>
+#include <client.h>
 
 class Server : public QTcpServer
 {
@@ -14,24 +15,22 @@ class Server : public QTcpServer
 
 public:
     Server(ChatDialog *w = 0, QObject *parent = 0);
-    explicit Server(QObject *parent = 0);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
 
 public slots:
-    void disconnect_id(qintptr id);
-    void get_message();
+    void GetMessage();
 
 private slots:
-    void startServer();
-    void add_connection();
-    void remove_connection();
+    void StartServer();
+    void AddConnection();
+    void RemoveConnection();
 
 private:
-    int count_connected = 0;
-    QMap <qintptr, Connection *> peers;
-    bool active = false;
+    int CountConnected = 0;
+    QMap <qintptr, Connection *> Peers;
+    bool Active = false;
 };
 
 #endif // SERVER_H

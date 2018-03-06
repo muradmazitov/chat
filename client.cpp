@@ -2,52 +2,62 @@
 
 Client::Client(ChatDialog *w)
 {
-    socket = new QTcpSocket();
-    connect(w->username, SIGNAL(textEdited(QString)), this, SLOT(change_username(QString)));
-    connect(w->serveradress, SIGNAL(textEdited(QString)), this, SLOT(connect_to_server()));
-    this -> serveradress = w -> serveradress;
-    this -> lineEdit = w -> lineEdit;
-    connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(send_message()));
+    Socket = new QTcpSocket();
 
-    dialog = w;
-    connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(getmessage()));
+    Dialog = w;
+    connect(Dialog->username, SIGNAL(textEdited(QString)), this, SLOT(ChangeUsername(QString)));
+    connect(Dialog->serveradress, SIGNAL(textEdited(QString)), this, SLOT(ConnectToServer()));
+
+    connect(Dialog->lineEdit, SIGNAL(returnPressed()), this, SLOT(SendMessage()));
+
+    connect(Socket, SIGNAL(connected()), this, SLOT(Connected()));
+    connect(Socket, SIGNAL(readyRead()), this, SLOT(GetMessage()));
+    connect(Socket, SIGNAL(disconnected()), this, SLOT(Stop()));
 }
 
-void Client::getmessage()
+void Client::GetMessage()
 {
-    QByteArray data = socket -> readAll();
+    QByteArray data = Socket->readAll();
     QString S = data;
-    dialog -> appendMessage(S);
+    Dialog -> AppendMessage(S);
 }
 
-void Client::change_username(QString name)
+void Client::ChangeUsername(QString name)
 {
-    username = name;
+    Username = name;
 }
 
-void Client::connect_to_server()
+void Client::ConnectToServer()
 {
-    if (socket -> ConnectedState)
-        socket -> close();
-    QString adress = serveradress -> text();
-    socket -> connectToHost(QHostAddress(adress), 1234);
-    socket -> waitForConnected(200);
+    if (Socket->ConnectedState)
+    {
+        Socket->disconnectFromHost();
+    }
+    QString adress = Dialog->serveradress->text();
+    Socket->connectToHost(QHostAddress(adress), 1234);
+    Socket->waitForConnected(1000);
+    Dialog->pushButton->close();
 }
 
-void Client::send_message()
+void Client::SendMessage()
 {
-    QString data = this -> lineEdit -> text();
+    QString data = Dialog->lineEdit->text();
 
-    socket -> write(QByteArray::fromStdString(data.toStdString()));
-    socket -> flush();
-    socket -> waitForBytesWritten(3000);
-    lineEdit -> clear();
+    Socket->write(QByteArray::fromStdString("<" + Username.toStdString()  + "> "+ data.toStdString()));
+    Socket->flush();
+    Socket->waitForBytesWritten(3 * 1000);
+
+    Dialog->lineEdit->clear();
 }
 
-void Client::connected()
+void Client::Connected()
 {
-    socket -> write("0 HI");
-    socket -> flush();
-    socket -> waitForBytesWritten(3000);
+    Socket->write(QByteArray::fromStdString("Hi, server! I'm, " + Username.toStdString()));
+    Socket->flush();
+    Socket->waitForBytesWritten(3 * 1000);
+}
+
+void Client::Stop()
+{
+    Socket->disconnectFromHost();
 }

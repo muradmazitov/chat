@@ -1,20 +1,23 @@
 #include "server.h"
 
-Server::Server(QObject *parent) : QTcpServer(parent)
-{}
-
 Server::Server(ChatDialog *w, QObject *parent) : QTcpServer(parent)
 {
-    connect(w -> pushButton, SIGNAL(pressed()), this, SLOT(startServer()));
+    connect(w->pushButton, SIGNAL(pressed()), this, SLOT(StartServer()));
 }
 
-void Server::startServer()
+void Server::StartServer()
 {
-    if (active) return;
-    active = true;
-    if (!this -> listen(QHostAddress::Any, 1234))
+    if (Active)
+    {
+        return;
+    }
+
+    Active = true;
+
+    if (!this->listen(QHostAddress::Any, 1234))
     {
         qDebug() << "Server couldnt start";
+        Active = false;
     }
     else
     {
@@ -24,46 +27,49 @@ void Server::startServer()
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    if (count_connected > 5)
+    if (CountConnected > 10)
+    {
         return;
-
+    }
     qDebug() << "INCOMING CONNECTION" << socketDescriptor;
-    Connection *connection = new Connection(socketDescriptor, this);
 
-    peers[socketDescriptor] = connection;
-    connect(connection, SIGNAL(disconnect_id(qintptr)), this, SLOT(disconnect_id(qintptr)));
-    connect(connection, SIGNAL(finished()), connection, SLOT(deleteLater()));
-    connect(connection, SIGNAL(add_connection()), this, SLOT(add_connection()));
-    connect(connection, SIGNAL(remove_connection()), this, SLOT(remove_connection()));
+    Connection *connection = new Connection(socketDescriptor);
 
-    connect(connection, SIGNAL(newmessage()), this, SLOT(get_message()));
-    connection -> start();
+    connect(connection, SIGNAL(AddConnection()), this, SLOT(AddConnection()));
+    connect(connection, SIGNAL(RemoveConnection()), this, SLOT(RemoveConnection()));
+    connect(connection, SIGNAL(NewMessage()), this, SLOT(GetMessage()));
+
+    connection->start();
+    Peers.insert(socketDescriptor, connection);
 }
 
-void Server::get_message()
+void Server::GetMessage()
 {
     Connection *sender = dynamic_cast<Connection*>(QObject::sender());
-    QByteArray message = sender -> message;
-    QList <Connection *> list = peers.values();
-    foreach(Connection * e, list)
+    QByteArray message = sender->Message;
+    QList <Connection *> list = Peers.values();
+    foreach (Connection * e, list)
     {
-        e -> socket -> write(message);
-        e -> socket -> flush();
-        e -> socket -> waitForBytesWritten(3000);
+        e->Socket->write(message);
+        e->Socket->flush();
+        e->Socket->waitForBytesWritten(3 * 1000);
     }
 }
 
-void Server::disconnect_id(qintptr id)
+void Server::AddConnection()
 {
-    peers.erase(peers.find(id));
+    qDebug() << "ADDING CONNECTION";
+    CountConnected++;
 }
 
-void Server::add_connection()
+void Server::RemoveConnection()
 {
-    count_connected++;
-}
+    qDebug() << "REMOVING CONNECTION";
+    CountConnected--;
+    Connection *sender = dynamic_cast<Connection *>(QObject::sender());
 
-void Server::remove_connection()
-{
-    count_connected--;
+    if (Peers.find(sender -> id) != Peers.end())
+    {
+        Peers.erase(Peers.find(sender -> id));
+    }
 }

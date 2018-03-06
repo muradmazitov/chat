@@ -15,13 +15,13 @@ public:
     ChatDialog(QWidget *parent = 0);
 
 public slots:
-    void appendMessage(QString message);
+    void AppendMessage(QString message);
 
 signals:
-    tryStartServer();
+    TryStartServer();
 
 private:
-    QTextTableFormat tableFormat;
+    QTextTableFormat TableFormat;
 };
 
 #endif

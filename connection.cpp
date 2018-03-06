@@ -1,48 +1,44 @@
 #include "connection.h"
 
-Connection::Connection(qintptr ID, QObject *parent) : QThread(parent)
+Connection::Connection(qintptr ID)
 {
-    this -> id = ID;
+    this->id = ID;
 }
 
 void Connection::run()
 {
     qDebug() << id << " STRATING THREAD";
-    socket = new QTcpSocket();
-    if (!socket -> setSocketDescriptor(id))
+    Socket.reset(new QTcpSocket());
+    if (!Socket->setSocketDescriptor(id))
     {
-        emit this->error(socket -> error());
+        emit this->Error(Socket -> error());
         return;
     }
-    emit add_connection();
-    socket -> write("0 HI");
-    socket->flush();
-    socket -> waitForBytesWritten(3000);
-    connect(socket, SIGNAL(connected()), this, SLOT(connected()), Qt::DirectConnection);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
-    qDebug() << id << "Client connected";
 
+    emit AddConnection();
+    Message = "client connected to chat";
+    emit NewMessage();
+
+    connect(Socket.data(), SIGNAL(readyRead()), this, SLOT(ReadyRead()), Qt::DirectConnection);
+    connect(Socket.data(), SIGNAL(disconnected()), this, SLOT(Disconnected()), Qt::DirectConnection);
+
+    qDebug() << id << "Client connected";
     exec();
 }
 
-void Connection::connected()
-{
-    qDebug() << "CONNECTED USER";
-}
 
-void Connection::readyRead()
+void Connection::ReadyRead()
 {
-    QByteArray data = socket->readAll();
+    QByteArray data = Socket->readAll();
     qDebug() << id << " data : " << data;
-    message = data;
-    emit newmessage();
+    Message = data;
+    emit NewMessage();
 }
 
-void Connection::disconnected()
+void Connection::Disconnected()
 {
+
     qDebug() << id << " disconnected";
-    emit remove_connection();
-    socket->deleteLater();
+    emit RemoveConnection();
     exit(0);
 }
